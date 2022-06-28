@@ -20,7 +20,7 @@ function buildMap(div: HTMLDivElement) {
 const Map: Component = () => {
   let mapDiv: any;
   onMount(() => buildMap(mapDiv));
-  return <div ref={mapDiv} id="map" class="h-300px w-100vw" />;
+  return <div ref={mapDiv} id="map" class="h-500px w-100%" />;
 };
 
 export default Map;

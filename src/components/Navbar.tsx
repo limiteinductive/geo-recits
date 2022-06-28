@@ -1,9 +1,17 @@
+import { createScrollPosition } from "@solid-primitives/scroll";
 import { Link } from "solid-app-router";
-import { Component } from "solid-js";
+import { Component, createEffect } from "solid-js";
 
 const Navbar: Component = () => {
+  const windowScroll = createScrollPosition();
+
+  createEffect(() => {
+    console.log(windowScroll.x, windowScroll.y);
+    }
+    );
+
   return (
-    <nav class="position-fixed w-100vw h-3rem font-sans bg-9FAFA1A0 border-color-9FAFA1A0 display-flex flex-between-center p-x-20 border-b-1px z-index-20">
+    <nav class={`position-fixed w-100vw h-40pxn font-sans ${windowScroll.y ? "bg-9FAFA1A0" : "bg-9FAFA1"} border-color-9FAFA1A0 display-flex flex-between-center p-x-20 border-b-1px z-index-20`}>
       <HomeLogo />
       <NavItems />
       <Searchbar />
@@ -51,7 +59,7 @@ const Searchbar: Component = () => {
       <input
         type="text"
         placeholder="Rechercher"
-        class="border-none outline-none br-12 w-100pct h-30px p-l-34px p-x-4 bg-9FAFA110"
+        class="border-none outline-none br-12 w-100pct h-34px p-l-34px p-x-4 bg-9FAFA110"
       />
     </div>
   );
