@@ -1,17 +1,43 @@
 import { createScrollPosition } from "@solid-primitives/scroll";
 import { Link } from "solid-app-router";
 import { Component, createEffect } from "solid-js";
+import { atom } from "solid-use";
 
 const Navbar: Component = () => {
   const windowScroll = createScrollPosition();
 
-  createEffect(() => {
-    console.log(windowScroll.x, windowScroll.y);
+  let scrollOffset = 200;
+  const hideNavbar = atom(false);
+
+  createEffect((prevScrollY: number) => {
+
+    if (prevScrollY < windowScroll.y) {
+        scrollOffset = scrollOffset + (prevScrollY - windowScroll.y);
+    } else {
+        scrollOffset = scrollOffset - (windowScroll.y - prevScrollY);
     }
-    );
+
+    if (scrollOffset > 200) {
+        scrollOffset = 200;
+        hideNavbar(false);
+    }
+
+    if (scrollOffset < 0) {
+        scrollOffset = 0;
+        hideNavbar(true);
+    }
+
+    console.log(hideNavbar())
+
+    console.log(scrollOffset);
+
+    return windowScroll.y;
+
+    }, 0);
+
 
   return (
-    <nav class={`position-fixed w-100vw h-40pxn font-sans ${windowScroll.y ? "bg-9FAFA1A0" : "bg-9FAFA1"} border-color-9FAFA1A0 display-flex flex-between-center p-x-20 border-b-1px z-index-20`}>
+    <nav class={`${hideNavbar() ? "-translate-y-60px" : ""} transition duration-500 ease-out display-flex  position-fixed w-100vw h-60px font-sans bg-9FAFA1A0  border-color-9FAFA1A0 flex-between-center p-x-20 border-b-1px z-index-20`}>
       <HomeLogo />
       <NavItems />
       <Searchbar />
