@@ -27,6 +27,7 @@
     "@unocss/reset": "^0.41.1",
     "leaflet": "^1.8.0",
     "normalize.css": "^8.0.1",
+    "simplebar": "^5.3.8",
     "solid-app-router": "^0.3.3",
     "solid-dismiss": "^1.2.1",
     "solid-icons": "^0.4.13",

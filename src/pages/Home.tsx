@@ -15,7 +15,7 @@ const Home: Component = () => {
 
 
   return (
-    <>
+    <div>
       <Navbar />
       <video
         autoplay
@@ -29,7 +29,7 @@ const Home: Component = () => {
       <Map />
       <Footer />
       <div></div>
-    </>
+    </div>
   );
 };
 
