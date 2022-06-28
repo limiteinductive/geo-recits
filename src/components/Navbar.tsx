@@ -3,7 +3,7 @@ import { Component } from "solid-js";
 
 const Navbar: Component = () => {
   return (
-    <nav class="w-100vw h-4rem bg-90CFEB display-flex flex-between-center p-x-20">
+    <nav class="position-fixed w-100vw h-3rem font-sans bg-9FAFA1A0 border-color-9FAFA1A0 display-flex flex-between-center p-x-20 border-b-1px z-index-20">
       <HomeLogo />
       <NavItems />
       <Searchbar />
@@ -15,7 +15,7 @@ const Navbar: Component = () => {
 const HomeLogo: Component = () => {
   return (
     <Link href="/">
-      <div display-flex>
+      <div display-flex min-width-px >
         <div class="i-ri-ancient-pavilion-fill font-size-40px p-y-2rem" />
         <span class="lh-4rem fs-24px fw-bold">Géo-Récits</span>
       </div>
@@ -51,7 +51,7 @@ const Searchbar: Component = () => {
       <input
         type="text"
         placeholder="Rechercher"
-        class="border border-2px border-color-3C4A3E br-12 w-100pct h-30px p-l-30px p-x-4"
+        class="border-none outline-none br-12 w-100pct h-30px p-l-34px p-x-4 bg-9FAFA110"
       />
     </div>
   );
