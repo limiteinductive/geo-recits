@@ -3,6 +3,8 @@ import { Link } from "solid-app-router";
 import { Component, createEffect } from "solid-js";
 import { atom } from "solid-use";
 
+import logo from "/src/assets/logo.png";
+
 const Navbar: Component = () => {
   const windowScroll = createScrollPosition();
 
@@ -10,89 +12,81 @@ const Navbar: Component = () => {
   const hideNavbar = atom(false);
 
   createEffect((prevScrollY: number) => {
-
     if (prevScrollY < windowScroll.y) {
-        scrollOffset = scrollOffset + (prevScrollY - windowScroll.y);
+      scrollOffset = scrollOffset + (prevScrollY - windowScroll.y);
     } else {
-        scrollOffset = scrollOffset - (windowScroll.y - prevScrollY);
+      scrollOffset = scrollOffset - (windowScroll.y - prevScrollY);
     }
 
     if (scrollOffset > 200) {
-        scrollOffset = 200;
-        hideNavbar(false);
+      scrollOffset = 200;
+      hideNavbar(false);
     }
 
     if (scrollOffset < 0) {
-        scrollOffset = 0;
-        hideNavbar(true);
+      scrollOffset = 0;
+      hideNavbar(true);
     }
 
-    console.log(hideNavbar())
+    console.log(hideNavbar());
 
     console.log(scrollOffset);
 
     return windowScroll.y;
-
-    }, 0);
-
+  }, 0);
 
   return (
-    <nav class={`${hideNavbar() ? "-translate-y-60px" : ""} transition duration-500 ease-out display-flex  position-fixed w-100vw h-60px font-sans bg-9FAFA1A0  border-color-9FAFA1A0 flex-between-center p-x-20 border-b-1px z-index-20`}>
-      <HomeLogo />
-      <NavItems />
-      <Searchbar />
-      <LoginButton />
+    <nav
+      class={`${hideNavbar() ? "-translate-y-100px" : ""} ${
+        windowScroll.y == 0 ? "" : "backdrop-blur-4px shadow-b-4px"
+      } transition duration-500 ease-out  position-fixed top-0 w-100vw h-80px font-sans bg-fff40 flex-between-center p-x-20 z-index-20`}
+    >
+      <div class="w-1280px flex mx-auto">
+        <HomeLogo />
+        <NavItems />
+        <NavBtn />
+      </div>
     </nav>
   );
 };
 
 const HomeLogo: Component = () => {
   return (
-    <Link href="/" >
-      <div class="display-flex min-width-180px hover:text-EEF8FC transition">
-        <div class="i-ri-ancient-pavilion-fill font-size-40px p-y-2rem" />
-        <span class="lh-4rem fs-24px fw-bold">Géo-Récits</span>
-      </div>
+    <Link href="/" class="-translate-x-42px">
+      <img src={logo} />
     </Link>
   );
 };
 
 const NavItems: Component = () => {
   return (
-    <div flex-around-center fs-18px>
-      <Link href="/carte" class="m-x-5vw">
-        <span fw-semi-bold hover:text-EEF8FC>Carte</span>
+    <div class="flex-around-center fs-18px mx-auto gap-4vw -translate-x-50px">
+      <Link href="/carte">
+        <span fw-semi-bold>Évenements</span>
       </Link>
 
-      <Link href="/project" class="m-x-5vw">
-        <span fw-semi-bold hover:text-EEF8FC>Projet</span>
+      <Link href="/project">
+        <span fw-semi-bold>Équipe & Partenaires</span>
       </Link>
 
-      <Link href="/participer" class="m-x-5vw">
-        <span fw-semi-bold hover:text-EEF8FC>Participer</span>
+      <Link href="/participer">
+        <span fw-semi-bold>Contact</span>
       </Link>
     </div>
   );
 };
 
-const Searchbar: Component = () => {
+const NavBtn: Component = () => {
   return (
-    <div class="position-relative">
-      <div class="position-absolute top-5px left-8px">
-        <div i-ic-baseline-search fs-22px/>
+    <div class="-translate-x-10px w-192px h-46px border-3.5px border-radius-10px mt-16px display-flex">
+      <div class="i-akar-icons-map fs-36px mx-14px mt-2px">
+      </div>
+      <div class="mt-4px fw-bold fs-21.5px">
+Découvrir
       </div>
 
-      <input
-        type="text"
-        placeholder=""
-        class="border-none outline-none br-12 w-100pct h-34px p-l-34px p-x-4 bg-9FAFA110"
-      />
     </div>
   );
-};
-
-const LoginButton: Component = () => {
-  return <></>;
 };
 
 export default Navbar;
