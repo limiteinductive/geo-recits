@@ -58,7 +58,7 @@ const What: Component = () => {
 
 const Title: Component = () => {
   return (
-    <div class="border-radius-10px border-fff mb-86px text-center border-3.5px h-90px w-600px mx-auto">
+    <div class="border-radius-10px border-fff mb-120px text-center border-3.5px h-90px w-600px mx-auto">
       <h1 class="text-3.2rem fw-600 color-fff">Qu'est-ce Géorécit ?</h1>
     </div>
   );
