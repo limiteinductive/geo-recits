@@ -103,15 +103,15 @@ const LeftPopup: Component<{ open: Atom<boolean>; data?: Atom<PopupData> }> = (
 
   return (
     <Show when={props.open()}>
-      <div class="position-absolute top-0 left-0 -z-10 h-100vh w-435px bg-ffffffa0 backdrop-blur-lg scrollbar-rounded scrollbar-w-100px">
+      <div class="position-absolute top-0 left-0 -z-10 h-100vh w-442px bg-ffffffa0 backdrop-blur-lg scrollbar scrollbar-rounded scrollbar-w-8px scrollbar-track-color-#b254de10 scrollbar-thumb-color-#300c4140">
         <img
           class="h-300px w-100% object-cover"
           src={
             "https://images.unsplash.com/photo-1551811484-e4e7b0fc775a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=880&q=80"
           }
         />
-        <div class="p-12px lh-30px w-full h-[calc(100vh-300px)] scrollbar scrollbar-rounded scrollbar-w-8px scrollbar-track-color-#b254de20 scrollbar-thumb-color-#b254de70">
-          <div class="my-14px">
+        <div class="px-30px py-20px lh-30px w-full">
+          <div class="my-18px">
           <h1 class="fs-2.7rem fw-bold">Ocean</h1>
           <div display-flex align-items-center gap-2px fw-regular>
             <div class="i-majesticons:map-marker-area"></div>
@@ -119,7 +119,7 @@ const LeftPopup: Component<{ open: Atom<boolean>; data?: Atom<PopupData> }> = (
           </div>
           </div>
 
-          <div class="text-justify lh-25px fs-0.8rem leading-0.7rem text-000000d0">
+          <div class="text-justify lh-25px fs-0.8rem leading-0.9rem text-000000d0">
             <p my-1rem>
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
               condimentum erat ac sagittis porttitor. Curabitur congue rutrum
