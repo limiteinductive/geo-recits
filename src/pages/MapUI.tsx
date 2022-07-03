@@ -115,11 +115,11 @@ const LeftPopup: Component<{ open: Atom<boolean>; data?: Atom<PopupData> }> = (
           <h1 class="fs-2.7rem fw-bold">Ocean</h1>
           <div display-flex align-items-center gap-2px fw-regular>
             <div class="i-majesticons:map-marker-area"></div>
-            <h2 class="fs-0.7rem">Gulf of Guinea</h2>
+            <h2 class="fs-0.9rem">Gulf of Guinea</h2>
           </div>
           </div>
 
-          <div class="text-justify lh-25px fs-0.7rem leading-0.7rem text-000000d0">
+          <div class="text-justify lh-25px fs-0.8rem leading-0.7rem text-000000d0">
             <p my-1rem>
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
               condimentum erat ac sagittis porttitor. Curabitur congue rutrum
