@@ -26,9 +26,11 @@ export default defineConfig({
         }),
       ],
     }),
+    
   ],
   build: {
     target: "esnext",
     polyfillDynamicImport: false,
   },
+  optimizeDeps: {include: ['mapbox-gl']},
 });

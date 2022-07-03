@@ -1,3 +1,4 @@
+import { NavLink } from "solid-app-router";
 import { Component } from "solid-js";
 
 import illu from "/src/assets/hero_illustration.png";
@@ -33,12 +34,12 @@ const HeroTitle: Component = () => {
 
 const HeroBtn: Component = () => {
   return (
-    <div class="">
+    <NavLink href="/map">
       <button class="w-300px h-54px bg-C57CE6 color-fff fw-bold fs-22px border-radius-10px flex pt-8px">
         <div class="i-akar-icons-map fs-40px mx-12px"></div>
         <div class="text-center pt-4px">Accédez à la carte</div>
       </button>
-    </div>
+    </NavLink>
   );
 };
 

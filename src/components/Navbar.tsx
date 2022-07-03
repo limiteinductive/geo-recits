@@ -1,5 +1,5 @@
 import { createScrollPosition } from "@solid-primitives/scroll";
-import { Link } from "solid-app-router";
+import { Link, NavLink } from "solid-app-router";
 import { Component, createEffect } from "solid-js";
 import { atom } from "solid-use";
 
@@ -78,14 +78,12 @@ const NavItems: Component = () => {
 
 const NavBtn: Component = () => {
   return (
-    <div class="-translate-x-10px w-192px h-46px border-3.5px border-radius-10px mt-16px display-flex">
-      <div class="i-akar-icons-map fs-36px mx-14px mt-2px">
+    <NavLink href="/map">
+      <div class="-translate-x-10px w-192px h-46px border-3.5px border-radius-10px mt-16px display-flex">
+        <div class="i-akar-icons-map fs-36px mx-14px mt-2px"></div>
+        <div class="mt-4px fw-bold fs-21.5px">Découvrir</div>
       </div>
-      <div class="mt-4px fw-bold fs-21.5px">
-Découvrir
-      </div>
-
-    </div>
+    </NavLink>
   );
 };
 
