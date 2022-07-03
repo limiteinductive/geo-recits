@@ -1,0 +1,24 @@
+.mapbox-logo{
+    display: none !important;
+}
+
+.mapboxgl-ctrl-logo {
+    display: none !important;
+}
+
+.leaflet-bottom, .leaflet-top {
+    z-index: 0 !important; // This is 1000 by default
+    position: absolute;
+    pointer-events: none;
+}
+
+.mapbox-improve-map { display: none; } 
+.mapboxgl-ctrl-compass { display: none !important; }
+
+.mapboxgl-ctrl-attrib-button {
+    display: none !important;
+}
+
+.mapboxgl-ctrl-bottom-right {
+    display: none;
+}

@@ -5,13 +5,15 @@ import { presetScalpel } from "unocss-preset-scalpel";
 import presetAttributify from "@unocss/preset-attributify";
 import { presetIcons } from "unocss";
 import presetWebFonts from "@unocss/preset-web-fonts";
-import presetUno from '@unocss/preset-uno'
+import presetUno from "@unocss/preset-uno";
+import { presetScrollbar } from "unocss-preset-scrollbar";
 
 export default defineConfig({
   plugins: [
     solidPlugin(),
     Unocss({
       presets: [
+        presetScrollbar({ numberToUnit: (value) => `${value}px` }),
         presetAttributify(),
         presetScalpel(),
         presetIcons(),
@@ -26,11 +28,10 @@ export default defineConfig({
         }),
       ],
     }),
-    
   ],
   build: {
     target: "esnext",
     polyfillDynamicImport: false,
   },
-  optimizeDeps: {include: ['mapbox-gl']},
+  optimizeDeps: { include: ["mapbox-gl"] },
 });

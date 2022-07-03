@@ -16,13 +16,12 @@ const Home: Component = () => {
 
 
   return (
-    <div>
+    <>
       <Navbar />
       <Hero />
       <What />
       <Footer />
-      <div></div>
-    </div>
+    </>
   );
 };
 
