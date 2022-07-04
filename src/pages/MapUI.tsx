@@ -15,8 +15,26 @@ import "./map.css";
 const MAPBOX_ACCESS_TOKEN =
   "pk.eyJ1IjoibGltaXRlaW5kdWN0aXZlIiwiYSI6ImNsNTJ0cmVuazBqN2wzZXBwYjRhaW84b3UifQ.Vh2inPsp2_Bbm-TaomM-lA";
 
+const DATA: PopupData[] = [
+  {
+    coverUrl:
+      "https://images.unsplash.com/photo-1551811484-e4e7b0fc775a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=880&q=80",
+    title: "Ocean",
+    location: "Gulf of Guinea",
+    description:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut condimentum erat ac sagittis porttitor. Curabitur congue rutrum diam. Donec vitae mi ac massa rhoncus porttitor venenatis sit amet nibh. Mauris vel condimentum velit, et gravida est. Ut cursushendrerit lectus, sit amet eleifend lectus finibus a. Morbi turpis eros, aliquet ut ligula vel, convallis viverra neque.",
+  },
+  {
+    coverUrl: "https://images.unsplash.com/photo-1624383045192-cf512eb9d78c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80",
+    title: "Port Harcourt",
+    location: "Nigeria",
+    description:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut condimentum erat ac sagittis porttitor. Curabitur congue rutrum diam. Donec vitae mi ac massa rhoncus porttitor venenatis sit amet nibh. Mauris vel condimentum velit, et gravida est. Ut cursushendrerit lectus, sit amet eleifend lectus finibus a. Morbi turpis eros, aliquet ut ligula vel, convallis viverra neque.",
+  },
+];
+
 const mapClick = atom(0);
-const leftToggle = atom(false);
+const leftToggle = atom(0);
 
 const MapUI: Component = () => {
   const [viewport, setViewport] = createSignal({
@@ -34,23 +52,13 @@ const MapUI: Component = () => {
       viewport={viewport()}
       onViewportChange={(view: Viewport) => setViewport(view)}
       onClick={() => {
-        if (leftToggle()) {
-          console.log("map click");
-          mapClick(mapClick() + 1);
-        }
+        mapClick(mapClick() + 1);
       }}
     >
       <MapSearch />
-      <LeftPopup open={leftToggle} />
-      <Marker
-        lngLat={[0, 0]}
-        options={{
-          color: leftToggle() ? "#C57CE6" : "#b254de",
-          scale: leftToggle() ? 1.2 : 1,
-        }}
-        toggle={leftToggle}
-        class="cursor pointer"
-      ></Marker>
+      <DataMarker lngLat={[0, 0]} data={DATA[0]}></DataMarker>
+
+      <DataMarker lngLat={[10, 10]} data={DATA[1]}></DataMarker>
     </MapGL>
   );
 };
@@ -71,8 +79,7 @@ const MapSearch: Component = () => {
       >
         <div
           onClick={() => {
-            leftToggle(false);
-            mapClick(0);
+            mapClick(mapClick() + 1);
           }}
           class="i-majesticons:close-line position-absolute top-16px left-382px h-38px w-38px text-00000060 hover:text-DC143Ca0"
         />
@@ -82,101 +89,76 @@ const MapSearch: Component = () => {
   );
 };
 
+const DataMarker: Component<{
+  lngLat: any;
+  options?: any;
+  data: PopupData;
+}> = (props) => {
+  const active = atom(false);
+
+  createEffect((prev) => {
+    if (leftToggle() == 2 && prev) {
+      active(false);
+      leftToggle(leftToggle() - 1);
+    }
+
+    return active();
+  }, false);
+
+  createEffect((prev) => {
+    if (mapClick() > 1 && prev && leftToggle() < 2) {
+      mapClick(0);
+      leftToggle(leftToggle() - 1);
+      active(false);
+    }
+    return active();
+  });
+
+  return (
+    <>
+      <LeftPopup open={active} data={props.data} />
+      <Marker
+        lngLat={props.lngLat}
+        options={{
+          color: active() ? "#C57CE6" : "#b254de",
+          scale: active() ? 1.2 : 1,
+        }}
+        onClick={() => {
+          mapClick(0);
+          leftToggle(leftToggle() + (active() ? -1 : 1));
+          active(!active());
+        }}
+      ></Marker>
+    </>
+  );
+};
+
 interface PopupData {
-  cover: string;
+  coverUrl: string;
   title: string;
-  date: string;
+  date?: string;
   location: string;
   description: string;
 }
 
-const LeftPopup: Component<{ open: Atom<boolean>; data?: Atom<PopupData> }> = (
+const LeftPopup: Component<{ open: Atom<boolean>; data: PopupData }> = (
   props
 ) => {
-  createEffect(() => {
-    if (mapClick() > 1) {
-      console.log("left popup closed");
-      props.open(false);
-      mapClick(0);
-    }
-  });
-
   return (
     <Show when={props.open()}>
       <div class="position-absolute top-0 left-0 -z-10 h-100vh w-442px bg-ffffffa0 backdrop-blur-lg scrollbar scrollbar-rounded scrollbar-w-8px scrollbar-track-color-#b254de10 scrollbar-thumb-color-#300c4140">
-        <img
-          class="h-300px w-100% object-cover"
-          src={
-            "https://images.unsplash.com/photo-1551811484-e4e7b0fc775a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=880&q=80"
-          }
-        />
+        <img class="h-300px w-100% object-cover" src={props.data.coverUrl} />
         <div class="px-30px py-20px lh-30px w-full">
           <div class="my-18px">
-          <h1 class="fs-2.7rem fw-bold">Ocean</h1>
-          <div display-flex align-items-center gap-2px fw-regular>
-            <div class="i-majesticons:map-marker-area"></div>
-            <h2 class="fs-0.9rem">Gulf of Guinea</h2>
-          </div>
+            <h1 class="fs-2.7rem fw-bold">{props.data.title}</h1>
+            <div display-flex align-items-center gap-2px fw-regular>
+              <div class="i-majesticons:map-marker-area"></div>
+              <h2 class="fs-0.9rem">{props.data.location}</h2>
+            </div>
           </div>
 
           <div class="text-justify lh-25px fs-0.8rem leading-0.9rem text-000000d0">
-            <p my-1rem>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
-              condimentum erat ac sagittis porttitor. Curabitur congue rutrum
-              diam. Donec vitae mi ac massa rhoncus porttitor venenatis sit amet
-              nibh. Mauris vel condimentum velit, et gravida est. Ut cursus
-              hendrerit lectus, sit amet eleifend lectus finibus a. Morbi turpis
-              eros, aliquet ut ligula vel, convallis viverra neque.
-            </p>
-            <p>
-              Maecenas convallis maximus justo vitae auctor. Aliquam quis
-              ultrices mauris. Integer venenatis eros nec sagittis feugiat.
-              Etiam viverra quam nec enim aliquam semper. Donec ante nunc,
-              porttitor in ornare a, aliquet a nisi. Praesent convallis vel
-              massa et tristique. Phasellus luctus tortor ac vehicula tempus.
-              Nunc at gravida metus. Fusce tellus ipsum, varius sit amet quam
-              eleifend, tincidunt fermentum quam. Maecenas posuere felis ut
-              tincidunt finibus. Nulla vulputate lacus vitae varius iaculis. Sed
-              placerat porta varius. Sed sit amet dictum tortor. Sed id lacus eu
-              dolor ultricies tincidunt nec mollis sapien. Nam convallis, ipsum
-              sit amet blandit viverra, metus orci rutrum ligula, bibendum
-              rhoncus metus nibh quis nisi.
-            </p>
-            <p my-1rem>
-              {" "}
-              Curabitur sollicitudin nibh semper, feugiat elit quis, rhoncus
-              elit. Pellentesque mollis odio tortor, quis fringilla lectus
-              maximus eget. Fusce id nisl pulvinar, volutpat sapien vel,
-              lobortis orci. Proin ligula est, ultrices id elit id, iaculis
-              egestas odio. Vestibulum ultrices lorem quis mi viverra iaculis.
-              Nulla lorem ipsum, efficitur sed dictum id, gravida vitae lorem.
-              Etiam efficitur convallis semper. Sed convallis sapien a quam
-              imperdiet dignissim. Nullam mollis enim feugiat tristique aliquet.
-              Proin neque turpis, maximus quis gravida et, euismod laoreet quam.
-              Vivamus finibus eget orci non aliquam. Mauris quis justo vel urna
-              fringilla hendrerit. In libero dolor, varius vel laoreet nec,
-              auctor pharetra magna. Nunc ac turpis vitae lorem auctor vehicula.
-              Fusce non posuere orci, ac molestie justo. Donec vel sem nibh.
-              Phasellus suscipit, mi vitae venenatis dignissim, ex lorem aliquam
-              ligula, non interdum leo nulla in lacus. Praesent pulvinar
-              molestie ex quis faucibus. Maecenas at ultrices mauris. Proin
-              consequat enim purus, sit amet semper lorem blandit ut.
-            </p>
-            <p my-1rem>
-              Maecenas at ultrices mauris. Proin consequat enim purus, sit amet
-              semper lorem blandit ut. Cras at mauris mauris. Phasellus gravida,
-              dolor ut vulputate sagittis, arcu nisl pharetra erat, at maximus
-              nunc justo vitae sapien. Integer scelerisque non massa sed
-              ultrices. Cras quis turpis id erat aliquam tincidunt. Fusce
-              tincidunt dignissim orci, eget porttitor ipsum egestas sed. Class
-              aptent taciti sociosqu ad litora torquent per conubia nostra, per
-              inceptos himenaeos. Donec tempor, tellus ut vehicula iaculis,
-              ligula felis fringilla tortor, ut feugiat lorem orci in arcu. Ut
-              nec tortor a diam iaculis sodales sit amet ut enim. Pellentesque
-              quis nunc tortor. Pellentesque enim sem, vulputate ac feugiat in,
-              dapibus nec orci. Nam nisl libero, pulvinar nec varius eget,
-              ullamcorper et augue.
-            </p>
+            <p my-1rem>{props.data.description}</p>
           </div>
         </div>
       </div>
