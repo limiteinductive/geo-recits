@@ -14,14 +14,30 @@ import { Atom, atom } from "solid-use";
 import Marker from "../components/Marker";
 import { createElementSize } from "@solid-primitives/resize-observer";
 import { Slider, createSlider } from "solid-slider";
+import KeenSlider, {
+  KeenSliderHooks,
+  KeenSliderInstance,
+  KeenSliderOptions,
+  KeenSliderPlugin,
+  TrackDetails,
+} from "keen-slider";
 
 import "./map.css";
 import { preview } from "vite";
+import faunadb from "faunadb";
 
-import "keen-slider/keen-slider.min.css"
+import "keen-slider/keen-slider.min.css";
 
 const MAPBOX_ACCESS_TOKEN =
   "pk.eyJ1IjoibGltaXRlaW5kdWN0aXZlIiwiYSI6ImNsNTJ0cmVuazBqN2wzZXBwYjRhaW84b3UifQ.Vh2inPsp2_Bbm-TaomM-lA";
+
+interface PopupData {
+  coverUrl: string;
+  title: string;
+  date?: string;
+  location: string;
+  description: string;
+}
 
 const DATA: PopupData[] = [
   {
@@ -42,6 +58,85 @@ const DATA: PopupData[] = [
   },
 ];
 
+const q = faunadb.query;
+
+var client = new faunadb.Client({
+  secret: "fnAEq04GAIAAyG_fRcJuEJQHZmiNXzvHm-gHLAVP",
+  domain: "db.eu.fauna.com",
+  // NOTE: Use the correct domain for your database's Region Group.
+  port: 443,
+  scheme: "https",
+});
+
+
+const query = q.Map(
+  q.Paginate(q.Documents(q.Collection("location"))),
+  q.Lambda((x) => q.Get(x))
+);
+
+const placeData: {data: any} = await client.query(query);
+
+console.log(placeData);
+
+const WheelControls: KeenSliderPlugin = (slider) => {
+  let touchTimeout: ReturnType<typeof setTimeout>;
+  let position: {
+    x: number;
+    y: number;
+  };
+  let wheelActive: boolean;
+
+  function dispatch(e: WheelEvent, name: string) {
+    position.x -= e.deltaX + e.deltaY;
+    position.y -= e.deltaY;
+    slider.container.dispatchEvent(
+      new CustomEvent(name, {
+        detail: {
+          x: position.x,
+          y: position.y,
+        },
+      })
+    );
+  }
+
+  function wheelStart(e: WheelEvent) {
+    position = {
+      x: e.pageX,
+      y: e.pageY,
+    };
+    dispatch(e, "ksDragStart");
+  }
+
+  function wheel(e: WheelEvent) {
+    dispatch(e, "ksDrag");
+  }
+
+  function wheelEnd(e: WheelEvent) {
+    dispatch(e, "ksDragEnd");
+  }
+
+  function eventWheel(e: WheelEvent) {
+    e.preventDefault();
+
+    if (!wheelActive) {
+      wheelStart(e);
+      wheelActive = true;
+    }
+    wheel(e);
+    clearTimeout(touchTimeout);
+    touchTimeout = setTimeout(() => {
+      wheelActive = false;
+      wheelEnd(e);
+    }, 50);
+  }
+
+  slider.on("created", () => {
+    slider.container.addEventListener("wheel", eventWheel, {
+      passive: false,
+    });
+  });
+};
+
 const mapClick = atom(0);
 const leftToggle = atom(0);
 
@@ -60,11 +155,29 @@ const MapUI: Component = () => {
       }}
       viewport={viewport()}
       onViewportChange={(view: Viewport) => setViewport(view)}
-      onClick={() => {
-        mapClick(mapClick() + 1);
-      }}
+      onClick={() => mapClick(mapClick() + 1)}
     >
       <MapSearch />
+      <For each={placeData.data}>
+        {(place: {data: any}) => {
+          return (
+            <Show when={place.data.lngLat}>
+              <DataMarker
+                lngLat={{
+                  lng: place.data.lngLat[0],
+                  lat: place.data.lngLat[1],
+                }}
+                data = {{
+                  coverUrl: "https://images.unsplash.com/photo-1519751138087-5bf79df62d5b?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80",
+                  title: place.data.Title,
+                  location: place.data.Title,
+                  description: "lalalal"
+                } as PopupData}
+              ></DataMarker>
+            </Show>
+          );
+        }}
+      </For>
       <DataMarker lngLat={[0, 0]} data={DATA[0]}></DataMarker>
       <DataMarker lngLat={[10, 10]} data={DATA[1]}></DataMarker>
       <DataMarker lngLat={[15, 30]} data={DATA[1]}></DataMarker>
@@ -103,7 +216,7 @@ const MapSearch: Component = () => {
 const DataMarker: Component<{
   lngLat: any;
   options?: any;
-  data: PopupData;
+  data?: PopupData;
 }> = (props) => {
   const active = atom(false);
 
@@ -144,14 +257,6 @@ const DataMarker: Component<{
   );
 };
 
-interface PopupData {
-  coverUrl: string;
-  title: string;
-  date?: string;
-  location: string;
-  description: string;
-}
-
 const LeftPopup: Component<{ open: Atom<boolean>; data: PopupData }> = (
   props
 ) => {
@@ -178,115 +283,75 @@ const LeftPopup: Component<{ open: Atom<boolean>; data: PopupData }> = (
 };
 
 const Carousel: Component = () => {
-
-
   return (
-      <div class="position-fixed h-180px mx-auto px-40px shadow-lg bg-ffffff40 backdrop-blur-lg z-10"
-      style="bottom: 80px ; left: calc( 480px ); max-width: calc( 100vw - 520px )">
-        <CarouselSlider></CarouselSlider>
-      </div>
+    <div
+      class="position-fixed h-180px mx-auto px-40px shadow-lg bg-ffffff40 backdrop-blur-lg z-10"
+      style="bottom: 80px ; left: calc( 480px ); max-width: calc( 100vw - 520px )"
+    >
+      <CarouselSlider></CarouselSlider>
+    </div>
   );
 };
 
 const CarouselSlider: Component = (props) => {
   const target = atom<HTMLElement | null>(null);
 
-  function WheelControls(slider) {
-    var touchTimeout
-    var position
-    var wheelActive
-
-    function dispatch(e, name) {
-      position.x -= e.deltaX
-      position.y -= e.deltaY
-      slider.container.dispatchEvent(
-        new CustomEvent(name, {
-          detail: {
-            x: position.x,
-            y: position.y,
-          },
-        })
-      )
-    }
-
-    function wheelStart(e) {
-      position = {
-        x: e.pageX,
-        y: e.pageY,
-      }
-      dispatch(e, "ksDragStart")
-    }
-
-    function wheel(e) {
-      dispatch(e, "ksDrag")
-    }
-
-    function wheelEnd(e) {
-      dispatch(e, "ksDragEnd")
-    }
-
-    function eventWheel(e) {
-      e.preventDefault()
-      if (!wheelActive) {
-        wheelStart(e)
-        wheelActive = true
-      }
-      wheel(e)
-      clearTimeout(touchTimeout)
-      touchTimeout = setTimeout(() => {
-        wheelActive = false
-        wheelEnd(e)
-      }, 50)
-    }
-
-    slider.on("created", () => {
-      slider.container.addEventListener("wheel", eventWheel, {
-        passive: false,
-      })
-    })
-  }
-
-  const [create, { current, next, prev, moveTo, details, slider, destroy }] = createSlider({
-    loop: false,
-    mode: "snap",
-    initial: 1,
-    slides: {perView: 'auto', spacing: 20, origin: 0.5},
-  },);
+  const [create, { current, next, prev, moveTo, details, slider, destroy }] =
+    createSlider(
+      {
+        loop: false,
+        mode: "snap",
+        initial: 1,
+        slides: { perView: "auto", spacing: 20, origin: 0.5 },
+      },
+      WheelControls
+    );
 
   return (
     <div
-        ref={target}
-        use:create
-        class="keen-slider bg-ffffff40 h-180px z-10 py-18px"
-        style="max-width: calc(100vw-720px)"
-      >
-        <For each={Array(10).fill(0)}>
-          {(_, i) => <CarouselCard current={current} id={i()} moveTo={moveTo} />}
-        </For>
-      </div>
-  )
-  }
+      ref={target}
+      use:create
+      class="keen-slider bg-ffffff40 h-180px z-10 py-18px"
+      style="max-width: calc(100vw-720px)"
+    >
+      <For each={Array(10).fill(0)}>
+        {(_, i) => <CarouselCard current={current} id={i()} moveTo={moveTo} />}
+      </For>
+    </div>
+  );
+};
 
-const CarouselCard: Component<{ data?: any; id: number; current: Atom<number>, moveTo: any}> = (
-  props
-) => {
+const CarouselCard: Component<{
+  data?: any;
+  id: number;
+  current: Atom<number>;
+  moveTo: any;
+}> = (props) => {
   const active = atom(false);
 
   createEffect((prev) => {
-
     if (prev != props.current()) {
       active(props.id == props.current());
     }
-    return props.current()
-  }, 0)
+    return props.current();
+  }, 0);
 
-
-  
-
-  return (<div onClick={() => {props.moveTo(props.id, 500) ; active(!active())}} class={`${active() ? "border-3px border-color-b254de" : ""} keen-slider__slide border-radius-10px min-width-180px max-height-140px bg-ffffff z-10`}
->
-    <img class="object-cover h-full w-full border-radius-9px z-10" src={`https://picsum.photos/seed/${props.id}/180/140`} />
-  </div>)
-}
+  return (
+    <div
+      onClick={() => {
+        props.moveTo(props.id, 500);
+        active(!active());
+      }}
+      class={`${
+        active() ? "ring-8px" : ""
+      } keen-slider__slide border-radius-15px min-width-180px max-height-140px bg-ffffff z-10 cursor-pointer`}
+    >
+      <img
+        class="object-cover h-full w-full border-radius-10px z-15 "
+        src={`https://picsum.photos/seed/${props.id}/180/140`}
+      />
+    </div>
+  );
+};
 
 export default MapUI;
